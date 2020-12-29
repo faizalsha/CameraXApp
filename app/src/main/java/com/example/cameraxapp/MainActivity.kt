@@ -7,10 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -105,11 +102,23 @@ class MainActivity : AppCompatActivity() {
 
                 imageCapture = ImageCapture.Builder().build()
 
+                val imageAnalyzer = ImageAnalysis.Builder().build().also {
+                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
+                        Log.d(TAG, "Average Luminosity: $luma")
+                    })
+                }
+
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
                 try {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+                    cameraProvider.bindToLifecycle(
+                        this,
+                        cameraSelector, //camera selector e.g. front or back camera
+                        preview,  // preview use case
+                        imageCapture, // imageCapture use case
+                        imageAnalyzer // imageAnalyzer
+                    )
                 } catch (e: Exception) {
                     Log.e(TAG, "binding failed", e)
                 }
