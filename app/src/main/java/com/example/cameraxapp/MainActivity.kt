@@ -3,6 +3,7 @@ package com.example.cameraxapp
 import android.Manifest
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
 import androidx.core.app.ActivityCompat
@@ -37,6 +38,21 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if(requestCode == REQUEST_CODE_PERMISSIONS){
+            if(allPermissionGranted()){
+                startCamera()
+            }else{
+                Toast.makeText(this, "Permission not Granted by the user", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     private fun takePhoto() {}
